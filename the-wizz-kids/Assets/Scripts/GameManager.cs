@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
 
     void InitializeGame()
     {
-        player = Instantiate(playerPrefab, new Vector3(1f, 2f, 0f), Quaternion.identity) as GameObject;
+        player = Instantiate(playerPrefab, new Vector3(0f, 0f, 1f), Quaternion.identity) as GameObject;
+
     }
 }
