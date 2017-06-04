@@ -13,43 +13,63 @@ public class Player : MonoBehaviour
     private RectTransform healthTrans;
     private RectTransform energyTrans;
 
+    // FIXME: if you plan on MVVM'ing this bish, change this
     private int _health;
+    /// <summary>
+    /// Gets or sets the health value
+    /// </summary>
     public int Health
     {
         get { return _health; } 
         set
         {
-            _health = value;
-            if(healthTrans != null)
+            if(value >= 0 && value <= maxHealth)
             {
-                // Becuase Unity is retarded
-                float f = (float)_health / (float)maxHealth;
-                float r = f * (float)maxWidth;
-                healthTrans.sizeDelta = new Vector2(r, healthTrans.rect.height);
-            }   
+                _health = value;
+                if(healthTrans != null)
+                {
+                    // Becuase Unity is retarded
+                    float f = (float)_health / (float)maxHealth;
+                    float r = f * (float)maxWidth;
+                    healthTrans.offsetMax = new Vector2(r, healthTrans.rect.height/2);
+                }
+
+                // Consider putting this elsewhere
+                if(_health == 0)
+                {
+                    Die();
+                }
+            }
         }
     }
 
     private int _energy;
+    /// <summary>
+    /// Gets or sets the energy value
+    /// </summary>
     public int Energy
     {
         get { return _energy; }
         set
         {
-            _energy = value;
-            if(energyTrans != null)
+            if(value <= maxEnergy && value >= 0)
             {
-                // Becuse Unity is retarded
-                float f = (float)_energy / (float)maxEnergy;
-                float r = f * (float)maxWidth;
-                energyTrans.sizeDelta = new Vector2(r, energyTrans.rect.height);
+                _energy = value;
+                if(energyTrans != null)
+                {
+                    // Becuse Unity is retarded
+                    float f = (float)_energy / (float)maxEnergy;
+                    float r = f * (float)maxWidth;
+                    energyTrans.offsetMax = new Vector2(r, energyTrans.rect.height/2);
+                }
             }
         }
     }
 
 
-
-	// Use this for initialization
+	/// <summary>
+    /// Start this instance.
+    /// </summary>
 	void Start () 
     {
         healthTrans = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<RectTransform>();
@@ -62,7 +82,9 @@ public class Player : MonoBehaviour
         _energy = maxEnergy;
 	}
 	
-	// Update is called once per frame
+    /// <summary>
+    /// Update this instance.
+    /// </summary>
 	void Update () 
     {
 
@@ -87,7 +109,7 @@ public class Player : MonoBehaviour
         }
         if(Input.GetMouseButtonDown(1))
         {
-            Energy -= 5;
+            Health += 5;
         }
 
         #elif UNITY_IOS || UNITY_ANDROID || UNITY_WP8 || UNITY_IPHONE
@@ -106,13 +128,13 @@ public class Player : MonoBehaviour
             }
         }
         #endif
-
-        if(Health <= 0)
-        {
-            Debug.Log("YOU DEAD BITCH GIT GUD U GOT RIGGITY REKT");
-        }
 	}
 
+    /// <summary>
+    /// Move the specified xDir and yDir.
+    /// </summary>
+    /// <param name="xDir">X dir.</param>
+    /// <param name="yDir">Y dir.</param>
     void Move(int xDir, int yDir)
     {
         Vector3 vec = new Vector3(xDir * speed, yDir * speed, 0f);
@@ -124,5 +146,14 @@ public class Player : MonoBehaviour
         // FIXME : Where the hell am i going to get these numbers??
         if(newX > -8.5 && newX < 8.5 && newY > -3.8 && newY < 3.8)
         this.transform.position += vec;
+    }
+
+    /// <summary>
+    /// Called when the player should die
+    /// </summary>
+    void Die()
+    {
+        Debug.Log("YOU DEAD BITCH");
+        Destroy(gameObject);
     }
 }

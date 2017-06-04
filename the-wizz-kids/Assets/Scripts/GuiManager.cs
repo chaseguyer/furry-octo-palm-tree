@@ -35,4 +35,17 @@ public class GuiManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void ContinueGame()
+    {
+        
+    }
+
+    public void SwitchFromMenuTo(GameObject toObj)
+    {
+        GameObject obj = GameObject.Find("Main");
+        obj.SetActive(false);
+
+        toObj.SetActive(true);
+    }
 }
