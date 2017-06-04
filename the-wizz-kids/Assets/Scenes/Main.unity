@@ -773,7 +773,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 646528448}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e19104cd2881f487d99470b9a0c6f1a9, type: 3}
+  m_Script: {fileID: 11500000, guid: e00de4799f8354a8893f32b7937bb911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &761824206
@@ -1738,6 +1738,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gameManager: {fileID: 1000012153952334, guid: 2f19469a5b34545ecbaf397f6990f826,
+    type: 2}
+  _guiManager: {fileID: 1000011661508564, guid: aae3d5374c9c34a2dada70279ea5b73c,
     type: 2}
 --- !u!1 &1893025505
 GameObject:

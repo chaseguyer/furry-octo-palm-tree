@@ -8,44 +8,69 @@ using System.Collections;
 /// </summary>
 public class GuiManager : MonoBehaviour 
 {
-	// Use this for initialization
-	void Start () 
+    /// <summary>
+    /// The GuiManager instance.
+    /// </summary>
+    public static GuiManager instance;
+
+    // Health/Energy bars calculations
+    private float maxWidth;
+    private RectTransform healthTrans;
+    private RectTransform energyTrans;
+
+    public void Awake()
     {
-	
-	}
-	
+        // Make sure there is only one instance
+        if(instance == null)
+            instance = this;
+        else if(instance != this)
+            Destroy(gameObject);
+
+        // We actually destroy this if we hit "Quit"
+        DontDestroyOnLoad(gameObject);
+
+        Initialize();
+    }
+
 	// Update is called once per frame
 	void Update () 
     {
 	
 	}
 
-    public void ToggleActive(GameObject obj)
+    public void Initialize()
     {
-        bool state = obj.activeSelf;
-        obj.SetActive(!state);
+        Debug.Log("Gui Init");
+
+        healthTrans = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<RectTransform>();
+        energyTrans = GameObject.FindGameObjectWithTag("EnergyBar").GetComponent<RectTransform>();
+        maxWidth = healthTrans.rect.width;
     }
 
-    public void LoadScene(string sceneName)
+    public void UpdateHealthBar(int cHealth, int mHealth)
     {
-        SceneManager.LoadScene(sceneName);
+        if(healthTrans != null)
+        {
+            // Becuase Unity is retarded
+            float f = (float)cHealth / (float)mHealth;
+            float r = f * (float)maxWidth;
+            healthTrans.offsetMax = new Vector2(r, healthTrans.rect.height/2);
+        }
     }
 
-    public void QuitGame()
+    public void UpdateEnergyBar(int cEnergy, int mEnergy)
     {
-        Application.Quit();
+        if(energyTrans != null)
+        {
+            // Becuse Unity is retarded
+            float f = (float)cEnergy / (float)mEnergy;
+            float r = f * (float)maxWidth;
+            energyTrans.offsetMax = new Vector2(r, energyTrans.rect.height/2);
+        }
     }
 
-    public void ContinueGame()
-    {
-        
-    }
+    // Update spells
+    // Grab players inventory
+    // Grab players gold
 
-    public void SwitchFromMenuTo(GameObject toObj)
-    {
-        GameObject obj = GameObject.Find("Main");
-        obj.SetActive(false);
-
-        toObj.SetActive(true);
-    }
 }

@@ -1,38 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Player : MonoBehaviour 
 {
-    public float speed = 0.2f;
+    /// <summary>
+    /// The attributes of the Player
+    /// </summary>
+    public Attributes attributes;
 
-    public int maxHealth = 100;
-    public int maxEnergy = 100;
-
-    private float maxWidth;
-
-    private RectTransform healthTrans;
-    private RectTransform energyTrans;
-
-    // FIXME: if you plan on MVVM'ing this bish, change this
     private int _health;
     /// <summary>
-    /// Gets or sets the health value
+    /// Gets or sets the current health value
     /// </summary>
     public int Health
     {
         get { return _health; } 
         set
         {
-            if(value >= 0 && value <= maxHealth)
+            if(value >= 0 && value <= attributes.Health)
             {
                 _health = value;
-                if(healthTrans != null)
-                {
-                    // Becuase Unity is retarded
-                    float f = (float)_health / (float)maxHealth;
-                    float r = f * (float)maxWidth;
-                    healthTrans.offsetMax = new Vector2(r, healthTrans.rect.height/2);
-                }
+
+                GuiManager.instance.UpdateHealthBar(_health, attributes.Health);
 
                 // Consider putting this elsewhere
                 if(_health == 0)
@@ -45,26 +35,56 @@ public class Player : MonoBehaviour
 
     private int _energy;
     /// <summary>
-    /// Gets or sets the energy value
+    /// Gets or sets the current energy value
     /// </summary>
     public int Energy
     {
         get { return _energy; }
         set
         {
-            if(value <= maxEnergy && value >= 0)
+            if(value <= attributes.Energy && value >= 0)
             {
                 _energy = value;
-                if(energyTrans != null)
-                {
-                    // Becuse Unity is retarded
-                    float f = (float)_energy / (float)maxEnergy;
-                    float r = f * (float)maxWidth;
-                    energyTrans.offsetMax = new Vector2(r, energyTrans.rect.height/2);
-                }
+
+                GuiManager.instance.UpdateEnergyBar(_energy, attributes.Energy);
             }
         }
     }
+
+    /// <summary>
+    /// The Player's list of learned spells
+    /// </summary>
+    public List<Spell> spellLibrary;
+
+    /// <summary>
+    /// The Player's list of equipped Spells
+    /// </summary>
+    public List<Spell> spellBook;
+
+    /// <summary>
+    /// The size of the spell book
+    /// </summary>
+    public int spellBookSize;
+
+    /// <summary>
+    /// The Player's active Spell
+    /// </summary>
+    public Spell activeSpell;
+
+    /// <summary>
+    /// The Player's unequipped Items
+    /// </summary>
+    public List<Item> backpack;
+
+    /// <summary>
+    /// The max size of the backpack
+    /// </summary>
+    public int backpackSize;
+
+    /// <summary>
+    /// The Player's equipped Items;
+    /// </summary>
+    public List<Item> equipped; 
 
 
 	/// <summary>
@@ -72,14 +92,12 @@ public class Player : MonoBehaviour
     /// </summary>
 	void Start () 
     {
-        healthTrans = GameObject.FindGameObjectWithTag("HealthBar").GetComponent<RectTransform>();
-        energyTrans = GameObject.FindGameObjectWithTag("EnergyBar").GetComponent<RectTransform>();
-
-        maxWidth = healthTrans.rect.width;
+        // Health, Energy, Speed, Damage
+        attributes = new Attributes(100, 100, 0.2f, 10);
 
         // Set values w/o using properties
-        _health = maxHealth;
-        _energy = maxEnergy;
+        _health = attributes.Health;
+        _energy = attributes.Energy;
 	}
 	
     /// <summary>
@@ -87,15 +105,19 @@ public class Player : MonoBehaviour
     /// </summary>
 	void Update () 
     {
+        HandleMovement();
+	}
 
-        // MOVEMENT
+
+    void HandleMovement()
+    {
         int horizontal = 0;
         int vertical = 0;
 
         #if UNITY_EDITOR
 
         horizontal = (int) (Input.GetAxisRaw ("Horizontal"));
-        vertical = (int) (Input.GetAxisRaw("Vertical"));
+        //vertical = (int) (Input.GetAxisRaw("Vertical"));
 
         if(horizontal != 0 || vertical != 0) 
         {
@@ -122,13 +144,13 @@ public class Player : MonoBehaviour
             {
                 Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
 
-                int x = (int)(touchDeltaPosition.x * speed);
+                //int x = (int)(touchDeltaPosition.x * speed);
                 int y = (int)(touchDeltaPosition.y * speed);
                 Move(x, y);
             }
         }
         #endif
-	}
+    }
 
     /// <summary>
     /// Move the specified xDir and yDir.
@@ -137,7 +159,7 @@ public class Player : MonoBehaviour
     /// <param name="yDir">Y dir.</param>
     void Move(int xDir, int yDir)
     {
-        Vector3 vec = new Vector3(xDir * speed, yDir * speed, 0f);
+        Vector3 vec = new Vector3(xDir * attributes.Speed, yDir * attributes.Speed, 0f);
 
         // What our new location will be
         float newX = gameObject.transform.position.x + vec.x;
